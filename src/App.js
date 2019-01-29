@@ -1,25 +1,56 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import IoService from './services/ioService';
 
 class App extends Component {
+  constructor() {
+    super();
+    this.sendMessage = this.sendMessage.bind(this);
+    
+    IoService.onMessage(this.messageHandler.bind(this));
+    window.IoService = IoService;
+    
+    this.state = {
+      messages: []
+    }
+  }
+
+  messageHandler(msg) {
+    console.log('message', msg);
+    this.setState({
+      messages: this.state.messages.concat([msg])
+    })
+  }
+
+  sendMessage() {
+    const message = this.inputField.value;
+
+    if (message === '') {
+      return ;
+    }
+
+    this.inputField.value = '';
+    IoService.sendMessage(message);
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div>
+        <div className="messages">
+          {
+            this.state.messages.map((msg, index) => {
+              return <div className="item" key={index}>{msg}</div>;
+            })
+          }
+        </div>
+        <div>
+          <input type="text" placeholder="please type your message here" ref={(ref) => {
+            this.inputField = ref;
+          }}></input>
+        </div>
+        <div>
+          <button onClick={this.sendMessage}>Send</button>
+        </div>
       </div>
     );
   }
