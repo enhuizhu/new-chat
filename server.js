@@ -4,9 +4,9 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const cors = require('cors')
 const channel = 'chat'
-const redis = require('redis')
-  , subscriber = redis.createClient()
-  , publisher  = redis.createClient();
+const redis = require('redis');
+const subscriber = redis.createClient();
+const publisher  = redis.createClient();
 
 
 subscriber.on('message', function(cha, message) {
