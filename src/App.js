@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import IoService from './services/ioService';
+import ApiService from './services/apiService';
 
 class App extends Component {
   constructor() {
@@ -12,13 +13,18 @@ class App extends Component {
     
     this.state = {
       messages: []
-    }
+    };
+  }
+
+  componentDidMount() {
+    ApiService.getUserData().then(res => {
+      this.userInfo = res.data;
+    });
   }
 
   messageHandler(msg) {
-    console.log('message', msg);
     this.setState({
-      messages: this.state.messages.concat([msg])
+      messages: this.state.messages.concat([JSON.parse(msg)])
     })
   }
 
@@ -30,7 +36,13 @@ class App extends Component {
     }
 
     this.inputField.value = '';
-    IoService.sendMessage(message);
+    
+    IoService.sendMessage(
+      {
+        user_id: this.userInfo.id,
+        message: message
+      }
+    );
   }
 
   render() {
@@ -39,7 +51,9 @@ class App extends Component {
         <div className="messages">
           {
             this.state.messages.map((msg, index) => {
-              return <div className="item" key={index}>{msg}</div>;
+              return (<div className="item" key={index}>
+                {msg.user_id}: {msg.message}
+              </div>);
             })
           }
         </div>

@@ -2,10 +2,12 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const cors = require('cors')
 const channel = 'chat'
 const redis = require('redis')
   , subscriber = redis.createClient()
   , publisher  = redis.createClient();
+
 
 subscriber.on('message', function(cha, message) {
   if (cha === channel) {
@@ -13,7 +15,10 @@ subscriber.on('message', function(cha, message) {
   }
 });
 
+
 subscriber.subscribe(channel);
+
+app.use(cors());
 
 app.use(express.static('build'));
 
@@ -28,12 +33,12 @@ app.get('/user/:userId', (req, res) => {
   );
 });
 
-http.listen(4000, function(){
-  console.log('listening on *:4000');
-});
-
 io.on('connection', function(client){
   client.on('send', (msg) => {
-    publisher.publish(channel, msg);
+    publisher.publish(channel, JSON.stringify(msg));
   });
+});
+
+http.listen(4000, function(){
+  console.log('listening on *:4000');
 });
