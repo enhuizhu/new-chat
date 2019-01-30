@@ -21,6 +21,7 @@ subscriber.subscribe(channel);
 app.use(cors());
 
 app.use(express.static('build'));
+app.use('/public', express.static('build'));
 
 app.get('/user/:userId', (req, res) => {
   res.send(
